@@ -1,0 +1,100 @@
+---
+title: "Plotting methods"
+author: "Hans"
+date: "9/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse) 
+```
+
+
+```{r}
+library(deSolve)
+
+expgrowth = function(timepoint, state, parameters) { 
+  with (as.list(c(state, parameters)), {
+    dY = a * Y
+    list(c(dY)) 
+  })
+}
+
+pars = c(a = -0.1)
+inistate1 = c(Y = 1)
+inistate2 = c(Y = 5)
+inistate3 = c(Y = 10)
+time_series = seq(0, 10, by = 0.1)
+
+# Here you find the solutions for the ODE abd generate the datasets
+# The dataset contains an Y and a Time column
+out1 = ode(y = inistate1, times = time_series, func = expgrowth, parms = pars)
+out2 = ode(y = inistate2, times = time_series, func = expgrowth, parms = pars)
+out3 = ode(y = inistate3, times = time_series, func = expgrowth, parms = pars)
+```
+
+# Method 1 - Plot with empty plot, then add lines
+
+Plotting objects in an empty plot, using the lines command
+
+First create an empty plot, by using type = 'n'
+You also specify a dummy parameter x (=1)
+
+```{r}
+plot(1, xlab = "time", ylab = "Y ", type = "n", 
+     xlim = c(0, 10), 
+     ylim = c(min(out3), max(out3)))
+ 
+# Because out1 already contains all the data, you do not need to specify y data
+lines(out1, ylab = "Y = 1", col = "blue", lty=2)
+lines(out2, ylab = "Y = 5", col = "red")
+lines(out3, ylab = "Y = 10", col = "black")
+```
+
+
+# Method 2 - Add datasets directly to plot
+
+You can simply provide the tree datsets to plot
+
+```{r}
+plot(out1, out2, out3)
+```
+
+
+# Method 3 - Do first line with plot, then add lines
+
+You can plot the first data set with plot and then add lines for the other datasets.
+
+That gives youbthe ability to control the individual lines better
+
+```{r}
+plot(out1, main = "Plot Title", ylab = "Y", col = "red", ylim = c(0, 10), lty=4) 
+lines(out2, col = "blue", lty=2)
+lines(out3, col = "green", lty=3)
+```
+
+
+# Method 4 Different approach: plot with the curve command
+
+ggplot expects a dataframe, so you have tgo convert
+
+```{r}
+rdata = as.data.frame(out1)
+ggplot(data = rdata) +
+  geom_line(mapping = aes(x = time, y = Y), color='blue')
+```
+
+```{r}
+
+decay <- function(t, k, P, A){
+  A * exp(-k*t) * sin (2*pi*t/P)
+}
+
+# Here you provide a function to plot
+curve(decay(x, 0.1, 4, 1), 0, 50, xlab="t", ylab="decay", col="red", n = 1000)
+```
