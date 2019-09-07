@@ -1,0 +1,235 @@
+---
+title: "Matrix"
+author: "Hans"
+date: "9/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# The Matrix
+
+The matrix function
+R wants the data to be entered by columns starting with column one
+1st arg: c(2,3,-2,1,2,2) the values of the elements filling the columns
+2nd arg: 3 the number of rows
+3rd arg: 2 the number of columns
+
+
+```{r}
+A <- matrix(c(2,3,-2,1,2,2),3,2)
+A
+
+is.matrix(A)
+is.vector(A)
+```
+
+
+
+# Multiplication by a Scalar
+
+```{r}
+A
+c <- 3
+c*A
+```
+
+   
+# Matrix Addition & Subtraction
+
+```{r}
+
+A
+B <- matrix(c(1,4,-2,1,2,1),3,2)
+B
+C <- A + B
+C 
+
+D <- A - B
+D
+```
+
+# Matrix Multiplication
+
+```{r}
+A
+D <- matrix(c(2,-2,1,2,3,1),2,3)
+D
+
+# D*A
+C <- D %*% A
+C
+
+# A*D
+C <- A %*% D
+C
+
+D <- matrix(c(2,1,3),1,3)
+D
+
+# D*A
+C <- D %*% A
+C
+
+```
+
+# Transpose of a Matrix
+
+```{r}
+A
+AT <- t(A)
+AT
+
+ATT <- t(AT)
+ATT
+```
+
+# Common Vectors
+
+
+```{r}
+# Unit Vector
+U <- matrix(1,3,1)
+U
+
+# Zero Vector
+
+Z <- matrix(0,3,1)
+Z
+```
+
+# Common Matrices
+
+```{r}
+# Unit Matrix
+
+U <- matrix(1,3,2)
+U
+
+# Zero Matrix
+
+Z <- matrix(0,3,2)
+Z
+
+# Diagonal Matrix
+
+S <- matrix(c(2,3,-2,1,2,2,4,2,3),3,3)
+S
+
+D <- diag(S)
+D
+
+D <- diag(diag(S))
+D
+
+# Identity Matrix
+
+I <- diag(c(1,1,1))
+I
+
+# Symmetric Matrix
+
+C <- matrix(c(2,1,5,1,3,4,5,4,-2),3,3)
+C
+
+CT <- t(C)
+CT
+```
+
+# Inverse of a Matrix
+
+```{r}
+A <- matrix(c(4,4,-2,2,6,2,2,8,4),3,3)
+A
+
+AI <- solve(A)
+AI
+
+A %*% AI
+
+AI %*% A
+
+# Inverse & Determinant of a Matrix
+
+C <- matrix(c(2,1,6,1,3,4,6,4,-2),3,3)
+C
+
+CI <- solve(C)
+CI
+
+d <- det(C)
+d
+
+# Rank of a Matrix
+A <- matrix(c(2,3,-2,1,2,2,4,7,0),3,3)
+A
+
+matA <- qr(A)
+matA$rank
+
+matA <- matrix(c(2,3,-2,1,2,2,4,6,-4),3,3)
+A
+
+matA <- qr(A)
+matA$rank
+
+
+# Number of Rows & Columns
+
+X <- matrix(c(3,2,4,3,2,-2,6,1),4,2)
+X
+
+dim(X)
+
+r <- nrow(X)
+r
+
+c <- ncol(X)
+c
+
+# Computing Column & Row Sums
+
+# note the uppercase S
+
+A <- matrix(c(2,3,-2,1,2,2),3,2)
+A
+
+c <- colSums(A)
+c
+
+r <- rowSums(A)
+r
+
+# Computing Column & Row Means
+
+# note the uppercase M
+
+cm <- colMeans(A)
+cm
+
+rm <- rowMeans(A)
+rm
+
+m <- mean(A)
+m
+
+# Horizontal Concatenation
+
+A
+
+B <- matrix(c(1,3,2,1,4,2),3,2)
+B
+
+C <- cbind(A,B)
+C
+
+
+# Vertical Concatenation (Appending)
+
+C <- rbind(A,B)
+C
+
+
+```
