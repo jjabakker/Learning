@@ -2,18 +2,18 @@ library(dplyr)
 library(tidyverse) 
 
 # Show the data for a complete overview
-view(mpg)
+View(mpg)
 ?mpg
 
 # Create a simple dot plot
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy))
 
-# You can override the color with a fixex value
+# You can override the color with a fixed value
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
 
-# You can also have an attribute determine the colouring. Note tat color is now insid the aes funcion
+# You can also have an attribute determine the colouring. Note that color is now inside the aes funcion
 ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, color = class))
 
@@ -64,7 +64,7 @@ ggplot(data = mpg)  +
   geom_point(mapping = aes (x = displ, y = hwy)) +
   geom_smooth(mapping = aes (x = displ, y = hwy))
 
-# Same effect as before, but wioth parameters reorganised
+# Same effect as before, but with parameters more conveniently reorganised
 ggplot(data = mpg, mapping = aes (x = displ, y = hwy))  +
   geom_point() +
   geom_smooth()
@@ -92,5 +92,24 @@ ggplot(data = mpg, mapping = aes (x = displ, y = hwy))  +
     data = filter(mpg, class == "subcompact"),
     se = FALSE)
 
+ggplot(data = mpg, mapping = aes (x = displ, y = hwy))  +
+  geom_point(mapping = aes(color = class)) +
+  geom_smooth(
+    data = filter(mpg, class == "pickup"))
+
 ggplot(data = mpg)  +
   geom_smooth(mapping = aes (x = displ, y = hwy,  class = drv))
+
+ggplot(data = mpg)  +
+  geom_smooth(mapping = aes (x = displ, y = hwy,  class = trans))
+
+
+# Create a simple dot plot
+p <- ggplot(data = mpg)
+p <- p + geom_point(mapping = aes(x = displ, y = hwy, color = cyl))
+p <- p + labs (color = "Cylinder cont.")
+p <- p + labs(x = "New x label")
+p <- p + labs(y = "New y label")
+p <- p + labs(title = "New Plot", subtitle = "New subtitle")
+p <- p + labs(caption = "(based on data from ...)")
+p
