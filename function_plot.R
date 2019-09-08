@@ -1,4 +1,8 @@
-# Routine to somply plot a file
+#
+#
+# Routine to simply plot a file
+#
+#
 
 library(ggplot2)
 
