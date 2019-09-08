@@ -1,6 +1,4 @@
-#
 # Routine to somply plot a file
-#
 
 library(ggplot2)
 
