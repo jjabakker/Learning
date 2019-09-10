@@ -1,0 +1,76 @@
+---
+title: "Who"
+author: "Hans"
+date: "9/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r}
+who = tidyr::who
+who
+
+# The new_sp_m014, new_sp_m1524, new_sp_m2534 ... columns are likely values
+# Create a new column 'key' and store the values there
+ 
+who1 <- who %>% 
+  gather(new_sp_m014:newrel_f65, key = "key", value = "cases", 
+         na.rm = TRUE ) 
+who1
+```
+
+```{r}
+
+# Inspect the key, to see what values there are
+# With a view on the coming 'separate' action, ensure that the format of the 
+# values iscconsistent
+
+who1 %>% count(key)
+who2 <- who1 %>% 
+  mutate(key = stringr::str_replace(key, "newrel", "new_rel")) 
+who2
+```
+
+```{r}
+
+# Now separate the key column in 3 separate columns
+
+who3 <- who2 %>% 
+  separate(key, c("new", "type", "sex_age"), sep = "_") 
+who3
+```
+
+```{r}
+
+# Two colums are redundant and the new column contains only one value
+# They can be removed
+
+who3 %>% count(new)
+who4 <- who3 %>%
+  select(-new, -iso2, -iso3)
+who4
+```
+
+```{r}
+
+# Split te sex and age columns
+
+who5 <- who4 %>% 
+  separate(sex_age, c("sex", "age"), sep = 1) 
+who5
+```
+
+```{r}
+
+# Change the char class of 'age' to integer
+
+who6 <- who5 %>% 
+  mutate(age = as.integer(age)) 
+who6
+```
+

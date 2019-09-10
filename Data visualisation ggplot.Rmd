@@ -1,0 +1,147 @@
+---
+title: "Data Visualisation"
+author: "Hans"
+date: "9/10/2019"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("pacman")) +
+  install.packages("pacman") 
+library(pacman)
+```
+
+
+```{r}
+p_load(tidyverse)
+p_load(gapminder)
+theme_set(theme_minimal())
+```
+
+```{r}
+glimpse(gapminder)
+```
+
+First set up the frame in which to plot
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p
+```
+
+
+Then add the code to create a dot plot
+
+```{r}
+p + geom_point()
+```
+
+Or, rather than a dot plot, get a smooth line
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth(se = F)
+```
+
+If you like, add a confidence interval around the line 
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth(se = F)
+```
+
+Or have both the points and the line!
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth() + 
+  geom_point()
+```
+
+
+Rather than a smooth line, you can also draw a regression line
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth(method = "lm") + 
+  geom_point()
+```
+
+Make the x-axis logarithmic
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth(method = "lm") + 
+  geom_point() + 
+  scale_x_log10()
+```
+
+Format the numbers on the x-axis as dollars
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth(method = "lm") + 
+  geom_point() + 
+  scale_x_log10(labels=scales::dollar)
+  
+```
+
+
+Now use color to visually separate the continents 
+
+```{r}
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent, fill = continent))
+p + geom_smooth() + 
+  geom_point() + 
+  scale_x_log10(labels=scales::dollar)
+  
+```
+
+You can apply te color only to the points and not tonthe smooth line
+
+```{r}
+p <- ggplot(data = gapminder, 
+            mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth() + 
+  geom_point(mapping = aes(color = continent, fill = continent)) + 
+  scale_x_log10(labels=scales::dollar) 
+```
+
+Add some decent looking labels
+
+```{r}
+p <- ggplot(data = gapminder, 
+            mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth() + 
+  geom_point(mapping = aes(color = continent, fill = continent)) + 
+  scale_x_log10(labels=scales::dollar) +
+  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+```
+
+What if you want to make the points less dominant? Use Alpha
+
+```{r}
+p <- ggplot(data = gapminder, 
+            mapping = aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth() + 
+  geom_point(mapping = aes(color = continent, fill = continent, alpha = 0.3)) + 
+  scale_x_log10(labels=scales::dollar) +
+  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+```
+
+It can be simplified; you do not need to ie the variable names 'data' and 'mapping' 
+
+```{r}
+p <- ggplot(gapminder,
+            aes(x = gdpPercap, y = lifeExp))
+p + geom_smooth() + 
+  geom_point(aes(color = continent, fill = continent, alpha = 0.3)) + 
+  scale_x_log10(labels=scales::dollar) +
+  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+```
+
+

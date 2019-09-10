@@ -1,0 +1,66 @@
+---
+title: "Untitled"
+author: "Hans"
+date: "9/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("pacman")) +
+  install.packages("pacman") 
+library(pacman)
+```
+
+```{r}
+p_load(tidyverse)
+```
+
+
+Create a tibble with NA values in it
+```{r}
+dd = tibble(x = 1:10,
+            y = x^2,
+            z = y - 60)
+dd[2,2] = NA
+dd[2,3] = NA
+dd[7,2] = NA
+dd[8,2] = NA
+dd[6,3] = NA
+dd[9,3] = NA
+dd
+```
+
+
+Remove all records where a NA occurs
+
+```{r}
+dd[complete.cases(dd), ]
+```
+
+Remove all records where a NA occurs in column x
+
+```{r}
+dd[complete.cases(dd['x']), ]
+```
+
+
+Remove all records where a NA occurs in column y
+
+```{r}
+dd[complete.cases(dd['y']), ]
+```
+
+Remove all records where a NA occurs in column z
+
+```{r}
+dd[complete.cases(dd['z']), ]
+```
+
+
+
+```{r}
+dd[complete.cases(dd), ]
+```
+
+dd[complete.cases(dd[,2]), ]
