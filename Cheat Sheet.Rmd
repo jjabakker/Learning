@@ -236,6 +236,7 @@ p <- p + labs(y = "New y label")
 p <- p + labs(title = "New Plot", subtitle = "New subtitle")
 p <- p + labs(caption = "(based on data from ...)")
 p
+
 ```
 
 ## Line plot

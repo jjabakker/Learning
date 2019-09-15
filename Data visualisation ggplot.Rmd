@@ -94,14 +94,15 @@ p + geom_smooth(method = "lm") +
 Now use color to visually separate the continents 
 
 ```{r}
-p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent, fill = continent))
+p <- ggplot(data=gapminder, mapping = aes(x = gdpPercap, y = lifeExp, 
+                                          color = continent, fill = continent))
 p + geom_smooth() + 
   geom_point() + 
   scale_x_log10(labels=scales::dollar)
   
 ```
 
-You can apply te color only to the points and not tonthe smooth line
+You can apply te color only to the points and not to the smooth line
 
 ```{r}
 p <- ggplot(data = gapminder, 
@@ -119,7 +120,8 @@ p <- ggplot(data = gapminder,
 p + geom_smooth() + 
   geom_point(mapping = aes(color = continent, fill = continent)) + 
   scale_x_log10(labels=scales::dollar) +
-  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+  labs(title = "Plot Title\n", x = "GDP per capita", 
+       y = "Life Expectancy", colour = "Continents\n")
 ```
 
 What if you want to make the points less dominant? Use Alpha
@@ -130,7 +132,8 @@ p <- ggplot(data = gapminder,
 p + geom_smooth() + 
   geom_point(mapping = aes(color = continent, fill = continent, alpha = 0.3)) + 
   scale_x_log10(labels=scales::dollar) +
-  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+  labs(title = "Plot Title\n", x = "GDP per capita", 
+       y = "Life Expectancy", colour = "Continents\n")
 ```
 
 It can be simplified; you do not need to ie the variable names 'data' and 'mapping' 
@@ -141,7 +144,8 @@ p <- ggplot(gapminder,
 p + geom_smooth() + 
   geom_point(aes(color = continent, fill = continent, alpha = 0.3)) + 
   scale_x_log10(labels=scales::dollar) +
-  labs(title = "Plot Title\n", x = "GDP per capita", y = "Life Expectancy", colour = "Continents\n")
+  labs(title = "Plot Title\n", x = "GDP per capita", 
+       y = "Life Expectancy", colour = "Continents\n")
 ```
 
 

@@ -1,0 +1,157 @@
+---
+title: "Qplot"
+author: "Hans"
+date: "9/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+
+```{r}
+
+# Use data from data.frame
+qplot(mpg, wt, data = mtcars)
+qplot(mpg, wt, data = mtcars, colour = cyl)
+qplot(mpg, wt, data = mtcars, size = cyl)
+qplot(mpg, wt, data = mtcars, facets = vs ~ am)
+
+
+qplot(1:10, rnorm(10), colour = runif(10))
+qplot(1:10, letters[1:10])
+mod <- lm(mpg ~ wt, data = mtcars)
+qplot(resid(mod), fitted(mod))
+
+f <- function() {
+   a <- 1:10
+   b <- a ^ 2
+   qplot(a, b)
+}
+f()
+
+# To set aesthetics, wrap in I()
+qplot(mpg, wt, data = mtcars, colour = I("red"))
+
+# qplot will attempt to guess what geom you want depending on the input
+# both x and y supplied = scatterplot
+qplot(mpg, wt, data = mtcars)
+# just x supplied = histogram
+qplot(mpg, data = mtcars)
+# just y supplied = scatterplot, with x = seq_along(y)
+qplot(y = mpg, data = mtcars)
+
+# Use different geoms
+qplot(mpg, wt, data = mtcars, geom = "path")
+qplot(factor(cyl), wt, data = mtcars, geom = c("boxplot", "jitter"))
+qplot(mpg, data = mtcars, geom = "dotplot")
+
+```
+
+```{r}
+data(mtcars)
+df <- mtcars[, c("mpg", "cyl", "wt")]
+head(df)
+
+qplot(x, y=NULL, data, geom="auto", 
+      xlim = c(NA, NA), ylim =c(NA, NA))
+
+# Use data from numeric vectors
+x <- 1:10; y = x*x
+
+# Basic plot
+qplot(x,y)
+
+# Add line
+qplot(x, y, geom=c("point", "line"))
+
+# Use data from a data frame
+qplot(mpg, wt, data=mtcars)
+
+# Smoothing
+qplot(mpg, wt, data = mtcars, geom = c("point", "smooth"))
+
+# Linear fits by group
+qplot(mpg, wt, data = mtcars, color = factor(cyl),
+      geom=c("point", "smooth"))
+
+# Change the color by a continuous numeric variable
+qplot(mpg, wt, data = mtcars, colour = cyl)
+
+# Change the color by groups (factor)
+df <- mtcars
+df[,'cyl'] <- as.factor(df[,'cyl'])
+qplot(mpg, wt, data = df, colour = cyl)
+
+# Add lines
+qplot(mpg, wt, data = df, colour = cyl,
+      geom=c("point", "line"))
+
+# Change the size of points according to the values of a continuous variable
+qplot(mpg, wt, data = mtcars, size = mpg)
+
+# Change point shapes by groups
+qplot(mpg, wt, data = mtcars, shape = factor(cyl))
+
+qplot(mpg, wt, data = mtcars, label = rownames(mtcars), 
+      geom=c("point", "text"),
+      hjust=0, vjust=0)
+
+head(PlantGrowth)
+
+# Basic box plot from a numeric vector
+x <- "1"
+y <- rnorm(100)
+qplot(x, y, geom="boxplot")
+
+# Basic box plot from data frame
+qplot(group, weight, data = PlantGrowth, 
+      geom=c("boxplot"))
+
+# Dot plot
+qplot(group, weight, data = PlantGrowth, 
+      geom=c("dotplot"), 
+      stackdir = "center", binaxis = "y")
+
+# Violin plot
+qplot(group, weight, data = PlantGrowth, 
+      geom=c("violin"), trim = FALSE)
+
+# Box plot from a data frame
+# Add jitter and change fill color by group
+qplot(group, weight, data = PlantGrowth, 
+      geom=c("boxplot", "jitter"), fill = group)
+
+# Dot plot
+qplot(group, weight, data = PlantGrowth, 
+      geom = "dotplot", stackdir = "center", binaxis = "y",
+      color = group, fill = group)
+
+set.seed(1234)
+mydata = data.frame(sex = factor(rep(c("F", "M"), each=200)),
+                    weight = c(rnorm(200, 55), rnorm(200, 58)))
+head(mydata)
+
+# Basic histogram
+qplot(weight, data = mydata, geom = "histogram")
+
+# Change histogram fill color by group (sex)
+qplot(weight, data = mydata, geom = "histogram",
+    fill = sex)
+
+# Basic density plot
+qplot(weight, data = mydata, geom = "density")
+
+# Change density plot line color by group (sex)
+# change line type
+qplot(weight, data = mydata, geom = "density",
+    color = sex, linetype = sex)
+
+qplot(weight, data = mydata, geom = "density",
+      xlab = "Weight (kg)", ylab = "Density", 
+      main = "Density plot of Weight")
+
+```
+
