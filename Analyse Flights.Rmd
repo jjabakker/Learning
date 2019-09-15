@@ -1,0 +1,52 @@
+---
+title: "Flights"
+author: "Hans"
+date: "9/14/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(maggrit)
+theme_set(theme_minimal())
+```
+
+```{r}
+flights
+glimpse(flights)
+
+
+# See the delays per airline
+flights %>%
+  left_join (airlines,  by = 'carrier') %>%
+  group_by(name) %>%
+  summarise(md = mean(arr_delay, na.rm = TRUE)) %>%
+  arrange(md) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x=name, y = md), 
+           stat = "identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+# See the delays per origin
+flights %>% 
+  left_join (airports, by = c('origin' = 'faa')) %>%
+  group_by(name) %>%
+  summarise(md = mean(dep_delay, na.rm = TRUE)) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x=name, y = md), stat = "identity")
+
+# See the delays per destination
+flights %>% 
+  left_join (airports, by = c('dest' = 'faa')) %>%
+  group_by(name) %>%
+  summarise(md = mean(dep_delay, na.rm = TRUE)) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x=name, y = md), stat = "identity") +
+  theme(axis.text.x = element_text(angle = 90, size = 5, hjust = 1))
+
+
+```
+

@@ -1,0 +1,60 @@
+--
+title: "Apply family"
+author: "Hans"
+date: "9/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+l1 <- list(num1 = 1, char1 = "Hi")
+l1
+l2 <- list(lgl1 = T, int1 = 3L)
+l2
+c1 <- c(l1, l2)
+c1
+n1 <- list(l1 = l1, l2 = l2)
+n1
+l1$char1
+sapply(cl, class)
+sapply(nl, class)
+```
+
+
+```{r}
+(fake.people <- data.frame(name = c("John", "Jane", "Karen"),
+                           age = c(29, 15, 56),
+                           married = c(F, F, T)))
+fake.people$married
+fake.people$married == TRUE
+fake.people[fake.people$married == TRUE]
+fake.people[fake.people$married == TRUE,]
+```
+
+# map_chr example
+
+'paste' concatenates vectors after converting to character
+Note you can use paste and paste0 more or less in the same way
+
+map_chr returns a character array of equal length as the input vector
+
+```{r}
+
+map_chr(fake.people$name, ~ paste0("Hello, ", ., "!"))
+
+# You can achieve the same effect with sapply, but a bit more difficukt
+
+testf <- function (param, par1) {
+  #print(par1)
+  return(cat("Hello", as.character(param), "!\n"))
+}
+
+
+sapply(fake.people$name, testf, par1 = 2222)
+```
+
+

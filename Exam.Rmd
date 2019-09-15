@@ -1,0 +1,114 @@
+---
+title: "Exam"
+author: "Hans"
+date: "9/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(Deriv)
+```
+
+
+```{r}
+
+
+# Function without parameters
+
+gsh <- function(x) {
+ (25.1*x) / (3.8*x+1.5) - (9.7*x^2)/(2.1*x^2+1.8)
+}
+
+gsh(10)
+
+xseq = seq(0, 10 ,0.01)
+yseq = gsh(xseq)
+df = data.frame(xseq, yseq)
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = yseq), color = "blue") +
+  labs(title = "Maximal level of the anti-oxidant glutathione (GSH)", 
+       x = "Drug dose concentration", 
+       y = "GSH concentration")
+```
+
+
+```{r}
+
+derivative_of_gsh = Deriv(gsh)
+
+xseq = seq(0, 10 ,0.01)
+yseq = derivative_of_gsh(xseq)
+df = data.frame(xseq, yseq)
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = yseq), color = "blue") +
+  labs(title = "Maximal level of the anti-oxidant glutathione (GSH)", 
+       x = "Drug dose concentration", 
+       y = "Der. GSH concentration")
+
+
+```
+
+
+```{r}
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = yseq), color = "blue") +
+  labs(title = "Plot Title", 
+       x = "Horizontal label", 
+       y = "Vertical label")
+
+xcross = uniroot(derivative_of_gsh, lower = 0, upper = 1)
+xcross$root
+(f1(xcross$root))
+
+```
+
+
+```{r}
+library(deSolve)
+library(phaseR)
+
+ode_func = function(timepoint, state, parameters) { 
+  with (as.list(c(state, parameters)), {
+    dx = b * x  - c*x * log(x) # Function definition
+    list(c(dx)) 
+  })
+}
+
+pars = c(b = 4.0, c = 3.2)
+inistate = c(x = 10)
+time_series = seq(0, 10, by = 0.1)
+
+out = ode(y = inistate, 
+          times = time_series, 
+          func = ode_func, 
+          parms = pars)
+plot(out, main = "", ylab = "x")
+out[1]
+```
+
+```{r}
+
+
+
+
+phaseport = phasePortrait(ode_func, 
+                          parameters = pars, 
+                          ylim = c(-10, 10), 
+                          points = 10, 
+                          xlab = "x", 
+                          ylab = "dx/dt", 
+                          state.names = c("x")     
+                          ) 
+grid() 
+
+```

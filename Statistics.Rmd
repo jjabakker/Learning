@@ -1,0 +1,200 @@
+---
+title: "Statistics"
+author: "Hans"
+date: "9/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+# Standard Error of the mean
+
+## Uniform distribution
+
+Take samples of an increasing size and repeat that 5 times   
+The standard deviation decreases with the increasing set size
+
+```{r}
+
+# sd  = 1/12
+
+for (n in c(2, 10, 100, 1000)) {
+  
+  cat ("\n5 runs for n = ", n, "\n")
+  for (i in 1:5) {
+    print(sd(runif(n)))
+  }
+}
+```
+
+```{r}
+cat("\n")
+nosim <- 1000
+n <- 10
+
+# Create a matrix of nosim by n 
+dat = matrix(runif(nosim * n), nosim, n)
+
+# Calculate the mean for every column
+datm = apply(dat, 1, mean)
+
+# Calculate the mean and sd of that column
+
+sdev = sd(datm)
+smean = mean(datm)
+
+# For a uniform distrbution tge variance is 1/12
+# The SD is sqrt(Var) 
+# The SEM is SD / sqrt(n)
+
+var = 1/12
+t = sqrt(var)/sqrt(n)
+cat('The observed sem is', sdev, 'compared to the theoretical',t)
+```
+
+
+## Normal distribution
+
+```{r}
+cat("\n")
+nosim <- 1000
+n <- 10
+
+# Create a matrix of nosim by n 
+dat = matrix(rnorm(nosim * n), nosim, n)
+
+# Calculate the mean for every column
+datm = apply(dat, 1, mean)
+
+# Calculate the mean and sd of that column
+
+sdev = sd(datm)
+smean = mean(datm)
+
+# For a normal distribution the variance is 1
+# The SD is sqrt(Var) 
+# The SEM is SD / sqrt(n)
+
+var = 1
+t = sqrt(var)/sqrt(n)
+cat('The observed sem is', sdev, 'compared to the theoretical',t)
+```
+
+
+## Poisson distribution
+
+```{r}
+cat("\n")
+nosim <- 1000
+n <- 10
+
+# Create a matrix of nosim by n 
+dat = matrix(rpois(nosim * n, 4), nosim, n)
+
+# Calculate the mean for every column
+datm = apply(dat, 1, mean)
+
+# Calculate the mean and sd of that column
+
+sdev = sd(datm)
+smean = mean(datm)
+
+# For a poisson(4) distribution the variance is 4
+# The SD is sqrt(Var) 
+# The SEM is SD / sqrt(n)
+
+var = 4
+t = sqrt(var)/sqrt(n)
+cat('The observed sem is', sdev, 'compared to the theoretical',t)
+```
+
+
+
+# Distributions
+
+## Normal
+```{r}
+
+# Use the 'd' functions to get the density probability 
+dnorm(0)
+x <- seq(-4,4,0.1)
+y <- dnorm(x)
+ggplot() + geom_line(aes(x = x, y = y))
+
+# Use the 'p' functions to get the cumulative probability 
+pnorm(0,  mean = 0, sd = 1)
+pmin1  = pnorm(-1, mean = 0, sd = 1)
+pplus1 = pnorm(+1, mean = 0, sd = 1)
+cat ("The +/- sd interval is:", pplus1 - pmin1)
+
+pmin2  = pnorm(-2, mean = 0, sd = 1)
+pplus2 = pnorm(+2, mean = 0, sd = 1)
+pplus2 - pmin2
+cat ("The +/- 2sd interval is:", pplus2 - pmin2)
+
+pmin196  = pnorm(-1.96, mean = 0, sd = 1)
+pplus196 = pnorm(+1.96, mean = 0, sd = 1)
+pplus196 - pmin196
+cat ("The +/- 2sd interval is:", pplus196 - pmin196)
+
+pmin3  = pnorm(-3, mean = 0, sd = 1)
+pplus3 = pnorm(+3, mean = 0, sd = 1)
+cat ("The +/- 3sd interval is:", pplus3 - pmin3)
+
+# Use the 'q' functions for quartile
+# This is the inverse of the probability function
+
+qbinom(x, size = 50, prob = .33)
+
+q10 = qnorm(0.10, mean = 0, sd = 1)
+q25 = qnorm(0.25, mean = 0, sd = 1)
+q50 = qnorm(0.50, mean = 0, sd = 1)
+q75 = qnorm(0.75, mean = 0, sd = 1)
+q90 = qnorm(0.90, mean = 0, sd = 1)
+
+pnorm(q10)
+pnorm(q25)
+pnorm(q50)
+pnorm(q75)
+pnorm(q75)
+
+# (Or do the same thing quicker)
+p = c(0.1, 0.25, 0.5, 0.75, 0.9)
+p
+q = qnorm(p, mean = 0, sd = 1)
+q
+
+# Use the 'r' functions for random samples
+rnorm(10, mean = 5, sd = 2)
+```
+
+# Binominal
+
+```{r}
+
+x <- 0:20
+y <- dbinom(x, size = 7, prob = .5)
+ggplot() + geom_bar(aes(x=x, y=y), stat = "identity", width=0.2)
+
+# Use the 'p' functions to get the cumulative probability 
+# What is the change to have x successes - or more - out of 8 tests with a chance 0.5 
+pbinom(6, size = 8, prob = 0.5, lower.tail = F)
+
+# Use the 'q' functions for quartile
+# This is the inverse of the probability function
+
+# How many successes do I need to have a chance of 50% that I achieve the test 
+qbinom(0.5, size = 8, prob = 0.5)
+
+# How many successes do I need to have a chance a that I achieve of 75% test
+qbinom(0.75, size = 8, prob = 0.5)
+
+# Use the 'r' functions for random samples
+rbinom(25, size = 50, prob = 0.5)
+```
+

@@ -9,10 +9,19 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+if (!require("pacman")) +
+  install.packages("pacman") 
+library(pacman)
 ```
 
 ```{r}
-library(tidyverse)
+p_load(tidyverse)
+p_load(modelr)
+p_load(measurements)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(dplyr)
+p_load(dslabs)
 ```
 
 
@@ -20,7 +29,7 @@ library(tidyverse)
 
 ```{r}
 
-# stringsAsFactors=FALSE is used to prevenbt the automatic creatuiib of factors
+# stringsAsFactors = FALSE is used to prevenbt the automatic creatuiib of factors
 # For 'sex' you want it, so there you specify it explicitly
 mydata <- data.frame(person=c("Peter","Lois","Meg","Chris","Stewie"),
                      age=c(42,40,17,14,1),
@@ -41,6 +50,9 @@ tib_iris <- as_tibble(iris)
 ```
 
 ```{r}
+
+# Create a 10n row tibble
+
 tibble(
   x = 1:10,
   y = 1,
@@ -48,15 +60,21 @@ tibble(
 )
 ```
 
+```{r}
+
+# A different method to create a tibble
 tribble(
   ~x, ~y, ~z,
   "a", 2, 3.6,
   "b", 1, 8.5)
-
+```
 
 
 
 ```{r}
+
+# Create a 1000 rowtibble
+
 tibble(
  a = lubridate::now() + runif(1e3) * 86400,
  b = lubridate::today() + runif(1e3) * 30,
@@ -73,11 +91,8 @@ df <- tibble(
 )
 
 df
-
 df$x
-
 df[["x"]]
-
 df[[1]]
 
 ```
@@ -96,7 +111,7 @@ df <- tibble(
 output <- vector("double", ncol(df))
 
 # Then loop
-for ( i in seq_along(df)) {
+for (i in seq_along(df)) {
   output[[i]]= median(df[[i]])  
 }
 output
@@ -105,18 +120,17 @@ output
 
 
 ```{r}
-#install.packages('nycflights13')
-library(dplyr)
-library(nycflights13)
+
 
 # Remove the flights that were cancelled 
-not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+not_cancelled <- flights %>% 
+  filter(!is.na(dep_delay), !is.na(arr_delay))
 not_cancelled
 
-#Get the average delay of all flights for each day
-(avdelay <- not_cancelled %>% 
+# Get the average delay of all flights for each day
+avdelay <- not_cancelled %>% 
   group_by(year, month, day) %>% 
-  summarise(mean = mean(dep_delay)))
+  summarise(mean = mean(dep_delay))
 
 avdelay
 
@@ -129,7 +143,6 @@ avdelay
 # Detect outlier
 
 ```{r}
-library (dslabs)
 
 # The data set contains a big outlier
 outlier_example
@@ -166,7 +179,6 @@ boxplot(oe)
 
 # Select
 
-dslab
 ```{r}
 iris
 
@@ -199,5 +211,60 @@ filter(starwars, gender == 'female')
 tib_starwars = as.tibble(starwars)
 class(tib_starwars)
 filter(tib_starwars, species == 'Human')
+```
+
+
+```{r}
+library(modelr)
+data(heights)
+heights
+```
+
+```{r}
+h <- heights %>%
+  mutate(
+    weight_kg_man = weight * 0.453592,
+    weight_kg_pkg = conv_unit(weight, "lbs", "kg"),
+    height_m = conv_unit(height, "inch", "m")
+  ) %>%
+  select(starts_with('weight'), starts_with("height"))
+h
+```
+
+```{r}
+my_heights <- heights %>%
+  mutate(
+    weight = conv_unit(weight, "lbs", "kg"),
+    height = conv_unit(height, "inch", "m"),
+    bmi = weight / height  ^ 2
+  ) %>% select(bmi, education)
+my_heights
+```
+
+```{r}
+h <- my_heights %>%
+  arrange(bmi) %>%
+  select(bmi, education)
+h
+```
+
+```{r}
+ggplot(h) +
+  geom_smooth(mapping = aes (x = bmi, y = education))
+```
+
+
+```{r}
+tailnum_delay_db <- flights %>% 
+  group_by(tailnum) %>%
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE),
+    n = n()
+  ) %>% 
+  arrange(desc(delay)) %>%
+  filter(n > 100)
+
+tailnum_delay_db
+
 ```
 
