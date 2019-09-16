@@ -1,0 +1,384 @@
+---
+title: "R test 16 September"
+author: "Hans"
+date: "9/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(ggplot2)
+p_load(Deriv)
+p_load(deSolve)
+p_load(phaseR)
+p_load(gridExtra)
+theme_set(theme_minimal())
+```
+
+
+# Question 1
+```{r}
+da <- function (x) {
+  24.2 * (1 + (x-13)/ (x^2 - 26*x + 529))
+} 
+
+(d0 = da(0))
+
+xseq = seq(0, 100, 0.01)
+yseq = da(xseq)
+df = data.frame(xseq, yseq)
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = yseq), color = "blue") +
+  labs(title = "Plot Title", 
+       x = "t", 
+       y = "a")
+
+```
+
+# Question 2
+
+```{r}
+df.da = Deriv(da, "x")
+df.da
+
+xseq = seq(0, 100, 0.01)
+yseq = df.da(xseq)
+df = data.frame(xseq, yseq)
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = yseq), color = "blue") +
+  labs(title = "Plot Title", 
+       x = "t", 
+       y = "da/dt")
+
+
+xcross = uniroot(df.da, lower = 20, upper = 50)
+xcross$root
+```
+
+# Question 3
+
+```{r}
+da(xcross$root)
+```
+
+# Question 4
+
+```{r}
+db <- function (x) {
+  23.6 + 1.3 * (x^2.9 / (x^2.9 + 3923.4))
+} 
+
+(d0 = da(0))
+
+xseq = seq(23, 26, 0.01)
+daseq = da(xseq)
+dbseq = db(xseq)
+df = data.frame(xseq, daseq, dbseq)
+
+ggplot(df) +
+  geom_line(mapping = aes(x = xseq, y = daseq), color = "blue") +
+  geom_line(mapping = aes(x = xseq, y = dbseq), color = "red") +
+  labs(title = "Plot Title", 
+       x = "t", 
+       y = "a (in blue)  and b (in rd)")
+```
+
+
+
+#  Question 5
+
+```{r}
+(db(10^6))
+```
+
+# Question 6 
+
+
+```{r}
+
+ode_r = function(timepoint, state, parameters) { 
+  with (as.list(c(state, parameters)), {
+    dR = k1 * S * R - k2 * R - k3 * R^2  # Function definition
+    list(c(dR)) 
+  })
+}
+
+time_series = seq(0, 5, by = 0.1)
+pars = c(k1 = 0.3, k2 = 0.9, k3 = 0.1, S = 10)
+
+inistate = c(R = 0)
+out0 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 10)
+out10 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 20)
+out20 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 30)
+out30 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+df = data.frame(out0, out10, out20, out30)
+ggplot(data = df) +
+  geom_line(mapping = aes(x=time, y = R)) +
+  geom_line(mapping = aes(x=time, y = R.1)) +
+  geom_line(mapping = aes(x=time, y = R.2)) +
+  geom_line(mapping = aes(x=time, y = R.3)) 
+```
+
+
+# Question 7
+
+```{r}
+phaseport = phasePortrait(ode_r, 
+                          parameters = pars, 
+                          ylim = c(-5, 30), 
+                          points = 10, 
+                          xlab = "RT", 
+                          ylab = "dR/dt (a = 1)", 
+                          state.names = c("R")) 
+grid() 
+
+```
+
+
+# Question 9
+
+```{r}
+
+ode_r = function(timepoint, state, parameters) { 
+  with (as.list(c(state, parameters)), {
+    dR = k1 * S * R - k2 * R - k3 * R^2  # Function definition
+    list(c(dR)) 
+  })
+}
+
+time_series = seq(0, 5, by = 0.1)
+pars = c(k1 = 0.3, k2 = 0.9, k3 = 0.1, S = 1)
+
+inistate = c(R = 0)
+out0 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 10)
+out10 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 20)
+out20 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+inistate = c(R = 30)
+out30 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+df = data.frame(out0, out10, out20, out30)
+ggplot(data = df) +
+  geom_line(mapping = aes(x=time, y = R)) +
+  geom_line(mapping = aes(x=time, y = R.1)) +
+  geom_line(mapping = aes(x=time, y = R.2)) +
+  geom_line(mapping = aes(x=time, y = R.3)) 
+```
+# Question 10
+
+```{r}
+ode_r = function(timepoint, state, parameters) { 
+  with (as.list(c(state, parameters)), {
+    dR = k1 * S * R - k2 * R - k3 * R^2  # Function definition
+    list(c(dR)) 
+  })
+}
+
+time_series = seq(0, 5, by = 0.1)
+pars = c(k1 = 0.3, k2 = 0.9, k3 = 0.1, S = 20)
+
+inistate = c(R = 10)
+out0 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+time_series = seq(5, 20, by = 0.1)
+pars = c(k1 = 0.3, k2 = 0.9, k3 = 0.1, S = 2)
+(finalstate = out0[nrow(out0),-1])
+inistate = finalstate
+out1 = ode(y = inistate, 
+           times = time_series, 
+           func = ode_r, 
+           parms = pars)
+
+
+df0 = data.frame(out0)
+df1 = data.frame(out1)
+
+ggplot() +
+  geom_line(data = df0, mapping = aes(x=time, y = R)) +
+  geom_line(data = df1, mapping = aes(x=time, y = R)) 
+  
+```
+
+
+# Question 12
+
+```{r}
+myFun <- function(arg1, arg2, input) { 
+  if (is.numeric(c(arg1, arg2))) { 
+    result <- cor(arg1, arg2) 
+  } else { 
+    print("Input should be numeric") 
+  } 
+} 
+
+x = seq(1, 10, 1)
+y = seq(1, 10, 1)
+(c = myFun(x,y,3))
+
+x = c('a', 'b', 'c', 'd', 'e')
+y = c('a', 'b', 'c', 'd', 'e')
+(c = myFun(x,y,3))
+
+x = seq(1, 10, 1)
+y = seq(1, 10, 1)
+x[2] = 'a'
+x
+y
+(c = myFun(x, y,3))
+
+```
+
+# Question 13
+
+```{r}
+
+return_letters <- function(index) {
+  letters[index]
+}
+
+test = c(25, 15, 21, 1, 18, 5, 1, 23, 5, 19, 15, 13, 5)
+return_letters(test)
+```
+
+# Question 14
+
+```{r}
+myFun <- function(a, b) {
+  result1 <- a * b
+  result2 <- a^b
+  result3 <- seq(from = a, to = b, length.out = 10)
+  #df = data.frame(result1, result2, result3)
+  #return(df)
+  return(list(result1, result2, result3))
+}
+
+res = myFun(2,4)
+res
+```
+
+
+# Question 16
+
+```{r}
+iris
+
+count(iris, Species)
+
+(mean_se= iris %>%
+  filter(Species == "setosa") %>%
+  summarise(m = mean(Sepal.Width)))
+
+(mean_ve= iris %>%
+  filter(Species == "versicolor") %>%
+  summarise(m = mean(Sepal.Width)))
+
+(mean_vi= iris %>%
+  filter(Species == "virginica") %>%
+  summarise(m = mean(Sepal.Width)))
+
+
+(iris%>%
+  filter (Species == "setosa" & Sepal.Width > mean_se$m) %>%
+  summarise(m = mean(Sepal.Width)))
+
+(iris%>%
+  filter (Species == "versicolor" & Sepal.Width > mean_ve$m) %>%
+  summarise(m = mean(Sepal.Width)))
+
+(iris%>%
+  filter (Species == "virginica" & Sepal.Width > mean_vi$m) %>%
+  summarise(m = mean(Sepal.Width)))
+
+
+
+```
+
+# Question 17
+
+```{r}
+weather
+
+n1 = left_join(flights, weather)
+n2 = filter(n, temp < 32)
+
+n2 %>%
+  group_by(month) %>%
+  summarise(n= n())
+
+left_join(flights, weather) %>%
+  filter(temp < 32) %>%
+  group_by(month) %>%
+  summarise(n= n())
+```
+
+# Question 18
+
+```{r}
+
+p <- ggplot(data = mtcars, mapping = aes(x = wt, 
+                                         y = mpg, 
+                                         shape = as.factor(cyl), 
+                                         colour = as.factor(cyl)))
+p <- p + geom_point()
+p <- p + geom_smooth(se = FALSE)
+p <- p + scale_y_reverse()
+p <- p + labs(color = "Cylinder cont.")
+p <- p + labs(x = "Car weight")
+p <- p + labs(y = "Fuel consumption [mpg]")
+p <- p + labs(title = "Fuel consumption as function of car weight")
+p <- p + labs(caption = "(Based on data from 'mtcars' datase)")
+p
+```
+
+
+# Question 19
+
+```{r}
+esoph
+new <-  esoph %>% spread(key = tobgp , value = ncontrols)
+new1 <-  esoph %>% spread(key = tobgp , value = ncases)
+>```
+
