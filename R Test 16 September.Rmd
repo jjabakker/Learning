@@ -378,7 +378,7 @@ p
 
 ```{r}
 esoph
-new <-  esoph %>% spread(key = tobgp , value = ncontrols)
+new <-  esoph %>% spread(key = tobgp, value = ncontrols)
 new1 <-  esoph %>% spread(key = tobgp , value = ncases)
 >```
 

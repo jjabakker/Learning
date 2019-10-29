@@ -1,0 +1,84 @@
+---
+title: "lm"
+author: "Hans"
+date: "9/17/2019"
+output: html_document
+---
+
+# Setup - always run
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(ggplot2)
+p_load(Deriv)
+p_load(deSolve)
+p_load(phaseR)
+p_load(gridExtra)
+theme_set(theme_minimal())
+```
+
+
+
+
+```{r}
+pitch = c(233,204,242,130,112,142)
+sex = c(rep("female",3),rep("male",3))
+my.df = data.frame(sex, pitch)
+
+# From the picture you would certainly say that sex is a factor that influences pitch
+ggplot(data = my.df) +
+  geom_point(mapping = aes(x = sex, y = pitch, color = sex))  
+
+# The null hpothesis is that sex does a factor that influences pitch
+# Now you look at the data and see if it supports the null hypothesis
+xmdl = lm(pitch ~ sex, my.df)
+
+
+# Interpretation:
+#   
+#   The overal p value of (0.002407) is very low. This indicates that such data would be very unlikely if the H0 hypothesis 
+#   were true. So, you reject the H0 and say that there is indeed a clear effect 
+
+# You can draw the line now
+ggplot(data = my.df) +
+  geom_point(mapping = aes(x = sex, y = pitch, color = sex)) +
+  geom_abline(aes(intercept = 226, slope = -98)) +
+  ylim(0,300)
+
+mean(my.df[my.df$sex=="female",]$pitch)    # This value is the intercept in the lm summary output
+mean(my.df[my.df$sex=="male",]$pitch)      # This value is the intercept + sexmale in the lm summary output
+```
+
+```{r}
+age = c(14,23,35,48,52,67)
+pitch = c(252,244,240,233,212,204)
+my.df = data.frame(age,pitch)
+
+ggplot(data = my.df) +
+  geom_point(mapping = aes(x = age, y = pitch, color = sex))  +
+  ylim(0,300)
+
+
+xmdl = lm(pitch ~ age, my.df)
+summary(xmdl)
+
+ggplot(data = my.df) +
+  geom_point(mapping = aes(x = age, y = pitch)) +
+  geom_abline(aes(intercept = 267, slope = -0.9)) +
+    ylim(0,300)
+
+my.df$age.c = my.df$age - mean(my.df$age)
+xmdl = lm(pitch ~ age.c, my.df)
+summary(xmdl)
+
+plot(fitted(xmdl),residuals(xmdl))
+
+plot(rnorm(100),rnorm(100))
+hist(residuals(xmdl))
+qqnorm(residuals(xmdl))
+```
+
+

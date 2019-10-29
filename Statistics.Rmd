@@ -7,10 +7,19 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(ggplot2)
-```
+library(pacman)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(ggplot2)
+p_load(Deriv)
+p_load(phaseR)
+p_load(gridExtra)
+theme_set(theme_minimal())
 
+std_err <- function(sample) {
+  sd(sample) / sqrt(length(sample)) 
+}
+```
 
 # Standard Error of the mean
 
@@ -48,7 +57,7 @@ datm = apply(dat, 1, mean)
 sdev = sd(datm)
 smean = mean(datm)
 
-# For a uniform distrbution tge variance is 1/12
+# For a uniform distrbution the variance is 1/12
 # The SD is sqrt(Var) 
 # The SEM is SD / sqrt(n)
 
@@ -124,13 +133,16 @@ cat('The observed sem is', sdev, 'compared to the theoretical',t)
 dnorm(0)
 x <- seq(-4,4,0.1)
 y <- dnorm(x)
-ggplot() + geom_line(aes(x = x, y = y))
+ggplot() + geom_line(aes(x = x, y = y)) + labs(title = 'Density - dnorm')
 
 # Use the 'p' functions to get the cumulative probability 
-pnorm(0,  mean = 0, sd = 1)
+pnorm(0, mean = 0, sd = 1)
 pmin1  = pnorm(-1, mean = 0, sd = 1)
 pplus1 = pnorm(+1, mean = 0, sd = 1)
 cat ("The +/- sd interval is:", pplus1 - pmin1)
+
+y = pnorm(x)
+ggplot() + geom_line(aes(x = x, y = y)) + labs(title = 'Cumulative - pnorm')
 
 pmin2  = pnorm(-2, mean = 0, sd = 1)
 pplus2 = pnorm(+2, mean = 0, sd = 1)
@@ -173,6 +185,30 @@ q
 rnorm(10, mean = 5, sd = 2)
 ```
 
+```{r}
+# Generate plots
+x <- seq(-4,4,0.1)
+d <- dnorm(x)
+p <- pnorm(x)
+r <- rnorm(x)
+
+
+ggplot() + 
+  geom_line(aes(x = x, y = d)) +
+  geom_line(aes(x = x, y = p))
+
+
+ggplot() + 
+  geom_point(aes(x = x, y = r))+ labs(title = 'Sample - rnorm')
+
+x <- seq(0,1,0.001)
+q <- qnorm(x)
+
+ggplot() + 
+  geom_line(aes(x = x, y = q)) + labs(title = 'Quantile - qnorm')
+
+```
+
 # Binominal
 
 ```{r}
@@ -196,5 +232,155 @@ qbinom(0.75, size = 8, prob = 0.5)
 
 # Use the 'r' functions for random samples
 rbinom(25, size = 50, prob = 0.5)
+```
+
+
+```{r}
+tdata = read_csv("T-testData.csv")
+
+# Single test on the difference 
+ts = t.test(tdata$Difference)
+ts
+
+# Paired test
+tp = t.test(x=tdata$Before, y=tdata$After, paired = TRUE)
+tp
+
+# Fully identical results!
+```
+
+
+```{r}
+# Generate a t distribution
+y <- rt(200, df = 5)
+
+# Plot the distribution against a normal distibution 
+qqnorm(y); 
+qqline(y, col = 'red')
+
+# Or plot two sets against each other
+z <- rt(300, df = 5)
+qqplot(y,  z)
+
+z <- rt(200, df = 3)
+qqplot(y,  z)
+
+n1 = rnorm(100000)
+qqnorm(n1)
+
+qqplot(n1,n1)
+
+```
+
+```{r}
+# Ref: http://rcompanion.org/rcompanion/c_01.html
+
+p_load(psych)
+data <- tribble (
+  ~Stream, ~Fish,
+  "Mill_Creek_1", 76,
+  "Mill_Creek_2", 102, 
+  "North_Branch_Rock_Creek_1", 12,
+  "North_Branch_Rock_Creek_2", 39, 
+  "Rock_Creek_1", 55, 
+  "Rock_Creek_2", 93, 
+  "Rock_Creek_3", 98,
+  "Rock_Creek_4", 53,
+  "Turkey_Branch", 102)
+
+describe(data$Fish)
+
+mean(data$Fish)
+median(data$Fish)
+mode(data$Fish)
+geometric.mean(data$Fish)     
+harmonic.mean(data$Fish)     
+
+var(data$Fish)
+sd(data$Fish)
+range(data$Fish)
+IQR(data$Fish)  
+
+(var  =  sum((data$Fish - mean(data$Fish))^2)/(length(data$Fish) - 1))
+(sdev =  sqrt(var))
+(sem = sdev / sqrt(length(data$Fish)))
+(std_err(data$Fish))
+
+# Confidence interval via t.test
+(tt = t.test(data$Fish))
+
+# Confidence interval manually, use the T distribution!
+q = qt(0.975, length(data$Fish) - 1)
+(ci_low = mean(data$Fish) - sem*q)
+(ci_hi  = mean(data$Fish) + sem*q)
+
+summary(tt)
+glimpse(tt)
+```
+
+```{r Normalised, manual using z-scores}
+
+std_err <- function(sample) {
+  sd(sample) / sqrt(length(sample)) 
+}
+
+# You can use 12 here, because that was a number in the H0 hypothesis 
+sem = std_err(sample)
+sample_mean= mean(sample)
+(zscore = (sample_mean - 12) / std_err(sample))
+(cl95 <- qnorm(0.975))
+
+#p <- dnorm_gg()
+#p <- p + geom_vline(aes(xintercept = x), data = tibble(x = c(-cl95, cl95)), color = "red")
+#p <- p + geom_vline(xintercept = zscore, color = "blue")
+#p
+```
+
+
+# Manual using t-values
+
+```{r}
+
+std_err <- function(sample) {
+  sd(sample) / sqrt(length(sample)) 
+}
+
+# Generate a 16 sample set 
+sample <- rnorm(16, 13.5, 2)
+
+# Manual
+mu   <- mean(sample)
+sd   <- sd(sample)
+df   <- length(sample)-1
+sem  <- sd / sqrt(length(sample))
+tval <- (mu - 12) / std_err(sample)
+clim <- qt(.975, df = df) 
+ci   <- mu + c(-clim, clim) * std_err(sample)
+pval <- 2 * pt(-abs(tval), df = df) # -abs(tvalue) to get lower tail
+
+cat("t = ", tval, ", df = ", df, ", p-value = ", pval)
+cat("95 percent confidence interval:")
+cat(ci[1], ci[2])
+cat("mean of x", mu)
+
+# Autmatic
+t.test(sample, mu = 12)
+
+```
+
+# Quantile
+
+```{r}
+x = rnorm(10000000, 0, 1)
+quantile(x, probs = 0.5)    # Should be approximately at 0
+
+# This selects the small tail on the left that is associated with x = -2
+quantile(x, probs = 0.025)
+
+# This selects the tail on the left that is associated with x = -1
+quantile(x, probs = 0.16)
+
+# This selects the small tail on the left that is associated with x = -3
+quantile(x, probs = 0.0015)
 ```
 

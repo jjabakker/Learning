@@ -1,0 +1,43 @@
+---
+title: "Regression"
+author: "Hans"
+date: "9/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(UsingR)
+data(diamond)
+library(ggplot2)
+
+g = ggplot(diamond, aes(x = carat, y = price))
+g = g + xlab("Mass (carats)")
+g = g + ylab("Price (SIN $)")
+g = g + geom_point(size = 7, colour = "black", alpha=0.5)
+g = g + geom_point(size = 5, colour = "blue", alpha=0.2)
+g
+
+# Smooth
+g + geom_smooth(method = "lm", colour = "black")
+
+fit <- lm(price ~ carat, data = diamond)
+g + geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+
+fit <- lm(price ~ I(carat - mean(carat)), data = diamond)
+coef(fit)
+g + geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+
+fit <- lm(price ~ I(10*carat), data = diamond)
+coef(fit)
+g + geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+
+fit <- lm(price ~ I(10*carat - mean(10*carat)), data = diamond)
+coef(fit)
+g + geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+```
+

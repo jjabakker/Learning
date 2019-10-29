@@ -1,0 +1,92 @@
+---
+title: "Untitled"
+author: "Hans"
+date: "9/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(tidyverse)
+p_load(nycflights13)
+p_load(ggplot2)
+p_load(gridExtra)
+p_load(psych)
+theme_set(theme_minimal())
+```
+
+
+```{r}
+### --------------------------------------------------------------
+### Standard error example, p. 115
+### --------------------------------------------------------------
+
+Input =("
+Stream                     Fish
+ Mill_Creek_1                76
+ Mill_Creek_2               102
+ North_Branch_Rock_Creek_1   12
+ North_Branch_Rock_Creek_2   39
+ Rock_Creek_1                55
+ Rock_Creek_2                93
+ Rock_Creek_3                98
+ Rock_Creek_4                53
+ Turkey_Branch              102
+")
+
+Data = read.table(textConnection(Input),header=TRUE)
+
+
+### Calculate standard error manually
+
+sd(Data$Fish, na.rm=TRUE) /  
+   sqrt(length(Data$Fish[!is.na(Data$ Fish)]))      # Standard error
+ 
+[1] 10.69527
+ 
+ 
+###  Use describe function from psych package for standard error
+###  Also works on whole data frames
+
+describe(Data)
+summary(Data)
+mean(Data[,'Fish'])
+sd(Data[,'Fish'])
+median(Data[,'Fish'])
+IQR(Data[,'Fish'])
+Data
+```
+
+#Not sure this works.....
+
+```{r}   
+
+x1 = seq(-4,4, 0.001)
+y1 = dnorm(x1, mean = 1.2, sd = 0.1/sqrt(12))
+y2 = dt(x1, df = 11)
+
+ggplot() +
+  geom_line(mapping=aes(x=x1, y=y1)) +
+  xlim(1.085, 1.315)
+
+x <- c(1.26, 1.39, 1.00, 1.00, 1.00, 1.10, 0.87, 1.23, 1.19, 1.29, 1.03, 1.18)
+meanx = mean(x)
+sdx = sd(x) 
+sdx = 0.1
+
+t.test(x, mu = 1.2, alternative = "less")
+
+```
+
+```{r}
+sample_size   = 40
+mean(sample(seq(1,6,1), size = sample_size, replace = TRUE))
+
+for (i in seq(1,10000,1)) {
+  x[i] = mean(sample(seq(1,6,1), size = sample_size, replace = TRUE))
+}
+
+plot(density(x))
+```
+
