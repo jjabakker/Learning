@@ -21,25 +21,29 @@ std_err <- function(sample) {
 }
 ```
 
-# Standard Error of the mean
-
-## Uniform distribution
-
+# Unclear 
 Take samples of an increasing size and repeat that 5 times   
 The standard deviation decreases with the increasing set size
 
 ```{r}
 
-# sd  = 1/12
+(sd  = 1/12)
 
 for (n in c(2, 10, 100, 1000)) {
   
   cat ("\n5 runs for n = ", n, "\n")
   for (i in 1:5) {
-    print(sd(runif(n)))
+    s = runif(n)
+    print(sd(s))
   }
 }
 ```
+
+
+# Standard Error of the mean
+
+## Uniform distribution
+
 
 ```{r}
 cat("\n")
@@ -62,7 +66,8 @@ smean = mean(datm)
 # The SEM is SD / sqrt(n)
 
 var = 1/12
-t = sqrt(var)/sqrt(n)
+sd = sqrt(var) 
+t = sd/sqrt(n)
 cat('The observed sem is', sdev, 'compared to the theoretical',t)
 ```
 
@@ -90,7 +95,8 @@ smean = mean(datm)
 # The SEM is SD / sqrt(n)
 
 var = 1
-t = sqrt(var)/sqrt(n)
+sd = sqrt(var) 
+t = sd/sqrt(n)
 cat('The observed sem is', sdev, 'compared to the theoretical',t)
 ```
 
@@ -118,49 +124,60 @@ smean = mean(datm)
 # The SEM is SD / sqrt(n)
 
 var = 4
-t = sqrt(var)/sqrt(n)
+sd = sqrt(var) 
+t = sd/sqrt(n)
 cat('The observed sem is', sdev, 'compared to the theoretical',t)
 ```
 
 
 
-# Distributions
+# Exploring Distributions
 
 ## Normal
 ```{r}
-
 # Use the 'd' functions to get the density probability 
 dnorm(0)
 x <- seq(-4,4,0.1)
 y <- dnorm(x)
-ggplot() + geom_line(aes(x = x, y = y)) + labs(title = 'Density - dnorm')
+ggplot() + 
+  geom_line(aes(x = x, y = y)) + 
+  labs(title = 'Density - dnorm')
+```
+
+```{r}
 
 # Use the 'p' functions to get the cumulative probability 
 pnorm(0, mean = 0, sd = 1)
 pmin1  = pnorm(-1, mean = 0, sd = 1)
 pplus1 = pnorm(+1, mean = 0, sd = 1)
 cat ("The +/- sd interval is:", pplus1 - pmin1)
-
 y = pnorm(x)
-ggplot() + geom_line(aes(x = x, y = y)) + labs(title = 'Cumulative - pnorm')
+ggplot() + 
+  geom_line(aes(x = x, y = y)) + 
+  labs(title = 'Cumulative - pnorm')
+```
+
+```{r}
 
 pmin2  = pnorm(-2, mean = 0, sd = 1)
 pplus2 = pnorm(+2, mean = 0, sd = 1)
-pplus2 - pmin2
-cat ("The +/- 2sd interval is:", pplus2 - pmin2)
+cat ("The +/- 2 sd interval is:", pplus2 - pmin2,"\n")
 
 pmin196  = pnorm(-1.96, mean = 0, sd = 1)
 pplus196 = pnorm(+1.96, mean = 0, sd = 1)
-pplus196 - pmin196
-cat ("The +/- 2sd interval is:", pplus196 - pmin196)
+cat ("The +/- 1.96 sd interval is:", pplus196 - pmin196,"\n")
 
 pmin3  = pnorm(-3, mean = 0, sd = 1)
 pplus3 = pnorm(+3, mean = 0, sd = 1)
-cat ("The +/- 3sd interval is:", pplus3 - pmin3)
+cat ("The +/- 3 sd interval is:", pplus3 - pmin3,"\n")
+```
+
+```{r}
 
 # Use the 'q' functions for quartile
 # This is the inverse of the probability function
 
+x = seq(0, 1, 0.2) 
 qbinom(x, size = 50, prob = .33)
 
 q10 = qnorm(0.10, mean = 0, sd = 1)
@@ -185,6 +202,8 @@ q
 rnorm(10, mean = 5, sd = 2)
 ```
 
+### Plots
+
 ```{r}
 # Generate plots
 x <- seq(-4,4,0.1)
@@ -199,17 +218,19 @@ ggplot() +
 
 
 ggplot() + 
-  geom_point(aes(x = x, y = r))+ labs(title = 'Sample - rnorm')
+  geom_point(aes(x = x, y = r)) + 
+  labs(title = 'Sample - rnorm')
 
 x <- seq(0,1,0.001)
 q <- qnorm(x)
 
 ggplot() + 
-  geom_line(aes(x = x, y = q)) + labs(title = 'Quantile - qnorm')
+  geom_line(aes(x = x, y = q)) + 
+  labs(title = 'Quantile - qnorm')
 
 ```
 
-# Binominal
+## Binominal
 
 ```{r}
 
@@ -235,6 +256,10 @@ rbinom(25, size = 50, prob = 0.5)
 ```
 
 
+# T-Test
+
+## Paired T-test
+
 ```{r}
 tdata = read_csv("T-testData.csv")
 
@@ -250,8 +275,9 @@ tp
 ```
 
 
+## T-distribution plots
 ```{r}
-# Generate a t distribution
+# Generate a t-distribution with 200 points
 y <- rt(200, df = 5)
 
 # Plot the distribution against a normal distibution 
@@ -265,12 +291,14 @@ qqplot(y,  z)
 z <- rt(200, df = 3)
 qqplot(y,  z)
 
-n1 = rnorm(100000)
+n1 = rnorm(1000)
 qqnorm(n1)
 
 qqplot(n1,n1)
 
 ```
+
+## T example
 
 ```{r}
 # Ref: http://rcompanion.org/rcompanion/c_01.html
@@ -301,9 +329,10 @@ sd(data$Fish)
 range(data$Fish)
 IQR(data$Fish)  
 
-(var  =  sum((data$Fish - mean(data$Fish))^2)/(length(data$Fish) - 1))
-(sdev =  sqrt(var))
-(sem = sdev / sqrt(length(data$Fish)))
+(n    = length(data$Fish))
+(var  = sum((data$Fish - mean(data$Fish))^2)/(length(data$Fish) - 1))
+(sdev = sqrt(var))
+(sem  = sdev / sqrt(n))
 (std_err(data$Fish))
 
 # Confidence interval via t.test
@@ -325,19 +354,16 @@ std_err <- function(sample) {
 }
 
 # You can use 12 here, because that was a number in the H0 hypothesis 
-sem = std_err(sample)
-sample_mean= mean(sample)
-(zscore = (sample_mean - 12) / std_err(sample))
+sem         = std_err(sample)
+sample_mean = mean(sample)
+(zscore     = (sample_mean - 12) / std_err(sample))
 (cl95 <- qnorm(0.975))
 
-#p <- dnorm_gg()
-#p <- p + geom_vline(aes(xintercept = x), data = tibble(x = c(-cl95, cl95)), color = "red")
-#p <- p + geom_vline(xintercept = zscore, color = "blue")
-#p
+
 ```
 
 
-# Manual using t-values
+## Manual using t-values
 
 ```{r}
 
@@ -345,22 +371,22 @@ std_err <- function(sample) {
   sd(sample) / sqrt(length(sample)) 
 }
 
-# Generate a 16 sample set 
+# Generate a 16 sample set  with mean = 13.5 and sd = 2
 sample <- rnorm(16, 13.5, 2)
 
 # Manual
 mu   <- mean(sample)
 sd   <- sd(sample)
+n    <- length(sample)
 df   <- length(sample)-1
-sem  <- sd / sqrt(length(sample))
+sem  <- sd / sqrt(n)
 tval <- (mu - 12) / std_err(sample)
 clim <- qt(.975, df = df) 
 ci   <- mu + c(-clim, clim) * std_err(sample)
 pval <- 2 * pt(-abs(tval), df = df) # -abs(tvalue) to get lower tail
 
-cat("t = ", tval, ", df = ", df, ", p-value = ", pval)
-cat("95 percent confidence interval:")
-cat(ci[1], ci[2])
+cat("t = ", tval, ", df = ", df, ", p-value = ", pval, "\n")
+cat("95 percent confidence interval:",ci[1], ci[2], "\n")
 cat("mean of x", mu)
 
 # Autmatic
@@ -382,5 +408,71 @@ quantile(x, probs = 0.16)
 
 # This selects the small tail on the left that is associated with x = -3
 quantile(x, probs = 0.0015)
+```
+
+
+# Law of large numbers
+
+```{r}
+# What does cumsum do?
+(x  <- 1:10)
+(cs <- cumsum(x))
+(y  <- cs/x)
+
+# Now the example
+# With increasing numbers the mean of the repeated normal draws creep to 0
+
+n <- 10000
+means <- cumsum(rnorm(n))/(1:n)
+
+g <- ggplot(data.frame(x = 1:n, y = means), aes(x = x, y = y))
+g <- g + geom_hline(yintercept = 0) + geom_line(size = 0.5)
+g <- g + labs(x = "Number of obs", y = "Cumulative mean")
+g
+```
+
+```{r}
+
+# With increasing numbers the mean of the repeated coin flip creeps to 0.5
+means <- cumsum(sample(0:1, n, replace = TRUE))/(1:n)
+g <- ggplot(data.frame(x = 1:n, y = means), aes(x = x, y = y))
+g <- g + geom_hline(yintercept = 0.5) + geom_line(size = 0.5)
+g
+```
+
+
+# Central Limit Theory
+
+You can generate a normal ditricutiin by throwinbg a dice 6 times.
+Then you take the mean and normalise it by cubtracting the population mean (3.5) and by dividing by the population sd/sqrt(n).
+
+From n = 6 onwards you get a good match
+
+```{r}
+
+x = seq(-4,4,0.1)
+y = dnorm(x)
+
+for_distribution = vector(mode = 'numeric',100)
+for (i in 1:1000) {
+  n = 1
+  sample_dice <- sample(1:6, n, replace = TRUE)
+  mean_sample <- mean(sample_dice)
+  for_distribution[i] <- (mean_sample - 3.5)/(1.71/sqrt(n))
+}
+  
+
+d <- density(for_distribution)
+plot(d)
+
+ggplot() + 
+  geom_density(aes(x=for_distribution)) +
+  geom_line(mapping = aes(x=x, y=y), colour = 'red')
+```
+
+```{r}
+p_load(UsingR)
+data(father.son)
+t.test(father.son$sheight - father.son$fheight)
 ```
 

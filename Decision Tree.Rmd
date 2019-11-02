@@ -1,0 +1,93 @@
+---
+title: "Decision Tree"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(tidyverse)
+p_load(ggplot2)
+p_load(gridExtra)
+theme_set(theme_minimal())
+```
+
+
+```{r}
+iris
+
+ggplot(data=iris) +
+  geom_point(mapping = aes(x = Petal.Width, y = Sepal.Width, color = Species))
+ggplot(data=iris) +
+  geom_point(mapping = aes(x = Petal.Length, y = Sepal.Length, color = Species))
+ggplot(data=iris) +
+  geom_point(mapping = aes(x = Sepal.Width, y = Petal.Width, color = Species))
+ggplot(data=iris) +
+  geom_point(mapping = aes(x = Speal.Length, y = Sepal.Width, color = Species))
+```
+
+
+
+```{r}
+p_load(caret)
+p_load(rattle)
+
+# Create a Training and Testing Set
+# It is a random process so everty time you do this you will get different sets
+
+inTrain  <- createDataPartition(y = iris$Species, p = 0.7, list = FALSE)
+training <- iris[inTrain,]
+testing  <- iris[-inTrain,]
+dim(iris)
+dim(training)
+dim(testing)
+
+```
+
+
+# Example of simple decision tree
+
+```{r}
+
+# Let the computer find the best decision tree for this Training set 
+modFit <- train(Species ~ ., method = "rpart", data = training)
+
+# Inspect the model
+
+modFit
+modFit$finalModel
+plot(modFit$finalModel, uniform = TRUE, main =  "Classifuication Tree")
+text(modFit$finalModel, use.n = TRUE, cex = 0.8)
+fancyRpartPlot(modFit$finalModel)
+
+# Now predict using the Test set and find out where it goes wrong
+
+testing
+pred <- predict(modFit, newdata = testing)
+cbind(pred, testing) %>%
+  filter(Species != predict_result)
+
+table(pred, testing$Species)
+```
+
+
+# Example Random Forest
+```{r}
+
+p_load(randomForest)
+# Let the computer find the best decision tree for this Training set 
+
+modFit <- train(Species ~ ., method = "rf", data = training, prox = TRUE)
+
+# Inspect the model
+
+modFit
+modFit$finalModel
+getTree(modFit$finalModel, k = 1)
+getTree(modFit$finalModel, k = 2)
+
+
+pred <-predict(modFit, testing)
+table(pred, testing$Species)
+```
+

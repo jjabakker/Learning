@@ -1,0 +1,133 @@
+---
+title: "Regression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+p_load(UsingR)
+p_load(ggplot2)
+data(galton)
+```
+
+
+```{r}
+
+
+# You needed to do a 'gather' to create a variable for the facet_grid
+# If you are OK to create two plots seperately you can use galton
+# Note that gather is doing the same as melt 
+# long_melt <- melt(galton)
+long_gather <- gather(galton,key = "variable", value = "value", child, parent)
+
+ggplot(long_gather, aes(x = value, fill = variable)) + 
+  geom_histogram(colour = "black", binwidth=1) +
+  facet_grid(. ~ variable)
+
+# Simpler approach.... 
+p1 <- ggplot(galton, aes(x = child)) + 
+  geom_histogram(fill = "red", colour = "black", binwidth=1) 
+p2 <- ggplot(galton, aes(x = parent)) + 
+  geom_histogram(fill = "blue", colour = "black", binwidth=1) 
+p1
+p2
+```
+
+
+A simple histogram of child and parent
+ 
+```{r}
+str(galton) 
+
+ggplot(data = galton,  aes(x = child))  +
+  geom_histogram(fill = "salmon", colour = "black", binwidth = 1) +
+  geom_vline(xintercept = mean(galton$child), size = 3)
+
+ggplot(data = galton,  aes(x = parent))  +
+  geom_histogram(fill = "salmon", colour = "black", binwidth = 1) +
+  geom_vline(xintercept = mean(galton$parent), size = 3)
+```
+
+In a simple dot plot you do not see where points are overlapping
+
+```{r}
+ggplot(data = galton,  aes(x = parent, y = child))  +
+  geom_point() 
+```
+
+You need to add frequency information to get a more informative plot 
+
+```{r freqGalton, dependson = "galton", fig.height = 6,fig.width = 7,echo = FALSE}
+# Convert the galton table to a dataframe with frequencies
+head(galton)
+gtab            <- table(galton$child, galton$parent)
+freqData        <- as.data.frame(gtab)
+names(freqData) <- c("child", "parent", "freq")
+head(freqData)
+
+# To convert from factor to numeric you need to go via character
+freqData$child  <- as.numeric(as.character(freqData$child))
+freqData$parent <- as.numeric(as.character(freqData$parent))
+head(freqData)
+
+p <- ggplot(data = filter(freqData, freq > 0), 
+            aes(x = parent, y = child)) +
+  scale_size(range = c(2, 20), guide = "none" ) + 
+  geom_point(colour = "grey50", aes(size = freq + 20, show_guide = FALSE)) + 
+  geom_point(aes(colour = freq, size = freq)) +
+  scale_colour_gradient(low = "lightblue", high = "white")                    
+p
+```
+
+The regression formula.
+
+```{r}
+
+
+lm.res <- lm(child ~ parent, data = galton)
+
+p + geom_abline(intercept = coef(lm.res)[1], slope = coef(lm.res)[2], size = 2, colour = grey(.5))  
+```
+
+```{r, fig.height=6,fig.width=7,echo=FALSE}
+
+freqData        <- as.data.frame(table(galton$child, galton$parent))
+names(freqData) <- c("child", "parent", "freq")
+freqData$child  <- as.numeric(as.character(freqData$child))
+freqData$parent <- as.numeric(as.character(freqData$parent))
+
+g <- ggplot(filter(freqData, freq > 0), aes(x = parent, y = child)) +
+  scale_size(range = c(2, 20), guide = "none" ) +
+  geom_point(colour="grey50", aes(size = freq+20, show_guide = FALSE)) +
+  geom_point(aes(colour=freq, size = freq)) +
+  scale_colour_gradient(low = "lightblue", high="white")                    
+
+lm1 <- lm(galton$child ~ galton$parent)
+
+g + geom_abline(intercept = coef(lm1)[1], slope = coef(lm1)[2], size = 3, colour = grey(.5))
+```
+
+```{r}
+library(dplyr)
+library(UsingR)
+library(manipulate)
+y <- galton$child - mean(galton$child)
+x <- galton$parent - mean(galton$parent)
+freqData <- as.data.frame(table(x, y))
+names(freqData) <- c("child", "parent", "freq")
+freqData$child  <- as.numeric(as.character(freqData$child))
+freqData$parent <- as.numeric(as.character(freqData$parent))
+myPlot <- function(beta){
+    g <- ggplot(filter(freqData, freq > 0), aes(x = parent, y = child))
+    g <- g  + scale_size(range = c(2, 20), guide = "none" )
+    g <- g + geom_point(colour="grey50", aes(size = freq+20), show.legend = FALSE)
+    g <- g + geom_point(aes(colour=freq, size = freq))
+    g <- g + scale_colour_gradient(low = "lightblue", high="white")
+    g <- g + geom_abline(intercept = 0, slope = beta, size = 3)
+    mse <- mean( (y - beta * x) ^2 )
+    g <- g + ggtitle(paste("beta = ", beta, "mse = ", round(mse, 3)))
+    g
+}
+manipulate(myPlot(beta), beta = slider(0.6, 1.2, step = 0.02))
+```
+
