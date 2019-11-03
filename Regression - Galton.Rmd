@@ -1,5 +1,5 @@
 ---
-title: "Regression"
+title: "Regression Models for Data Science"
 output: html_document
 ---
 
@@ -14,9 +14,10 @@ data(galton)
 ```{r}
 
 
-# You needed to do a 'gather' to create a variable for the facet_grid
+# You need to do a 'gather' to create a variable for the facet_grid
 # If you are OK to create two plots seperately you can use galton
 # Note that gather is doing the same as melt 
+
 # long_melt <- melt(galton)
 long_gather <- gather(galton,key = "variable", value = "value", child, parent)
 
@@ -89,23 +90,7 @@ lm.res <- lm(child ~ parent, data = galton)
 p + geom_abline(intercept = coef(lm.res)[1], slope = coef(lm.res)[2], size = 2, colour = grey(.5))  
 ```
 
-```{r, fig.height=6,fig.width=7,echo=FALSE}
 
-freqData        <- as.data.frame(table(galton$child, galton$parent))
-names(freqData) <- c("child", "parent", "freq")
-freqData$child  <- as.numeric(as.character(freqData$child))
-freqData$parent <- as.numeric(as.character(freqData$parent))
-
-g <- ggplot(filter(freqData, freq > 0), aes(x = parent, y = child)) +
-  scale_size(range = c(2, 20), guide = "none" ) +
-  geom_point(colour="grey50", aes(size = freq+20, show_guide = FALSE)) +
-  geom_point(aes(colour=freq, size = freq)) +
-  scale_colour_gradient(low = "lightblue", high="white")                    
-
-lm1 <- lm(galton$child ~ galton$parent)
-
-g + geom_abline(intercept = coef(lm1)[1], slope = coef(lm1)[2], size = 3, colour = grey(.5))
-```
 
 ```{r}
 library(dplyr)

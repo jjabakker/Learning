@@ -1,0 +1,73 @@
+---
+title: "Regression"
+author: "Hans"
+date: "9/24/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Example of lm with centering
+
+```{r}
+library(UsingR)
+data(diamond)
+library(ggplot2)
+
+g <- ggplot(diamond, aes(x = carat, y = price)) +
+  xlab("Mass (carats)") +
+  ylab("Price (SIN $)") +
+  geom_point(size = 7, colour = "black", alpha = 0.5) +
+  geom_point(size = 5, colour = "blue", alpha = 0.2) 
+g
+
+# Draw a line with geom_smooth 
+g + geom_smooth(method = "lm", colour = "black")
+
+# The line you draw with geom_smooth is exactly the same line as you create with lm 
+fit <- lm(price ~ carat, data = diamond)
+coef(fit)
+  g + geom_smooth(method = "lm", colour = "black") +
+  geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+
+# If you center the carat values around the mean, the slope remains same, but the intersect changes 
+fit <- lm(price  ~ I(carat - mean(carat)), data = diamond)
+coef(fit)
+
+gc <- ggplot(diamond, aes(x = carat - mean(carat), y = price)) +
+  xlab("Centered Mass (carats)") +
+  ylab("Dentered Price (SIN $)") +
+  geom_point(size = 7, colour = "black", alpha = 0.5) +
+  geom_point(size = 5, colour = "blue", alpha = 0.2) +
+  geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
+gc
+
+
+# Adjust the carat unitsto 1/10 of a carat
+fit <- lm(price ~ I(10*carat), data = diamond)
+coef(fit)
+
+ga <- ggplot(diamond, aes(x = 10*carat, y = price)) +
+  xlab("Centered Mass (1/10 of a carat)") +
+  ylab("Dentered Price (SIN $)") +
+  geom_point(size = 7, colour = "black", alpha = 0.5) +
+  geom_point(size = 5, colour = "blue", alpha = 0.2) +
+  geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
+ga
+
+
+# If you adjust the carat units and center on the mean....
+fit <- lm(price ~ I(10 * carat - mean(10 * carat)), data = diamond)
+coef(fit)
+gac <- ggplot(diamond, aes(x = 10 * carat - mean(10 * carat), y = price)) +
+  xlab("Centered Mass (1/10 of a carat)") +
+  ylab("Dentered Price (SIN $)") +
+  geom_point(size = 7, colour = "black", alpha = 0.5) +
+  geom_point(size = 5, colour = "blue", alpha = 0.2) +
+  geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
+gac
+
+```
+
