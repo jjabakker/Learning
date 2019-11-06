@@ -1,0 +1,46 @@
+---
+title: "Regression - Swiss"
+author: "Hans"
+date: "11/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(ggplot2)
+```
+
+```{r}
+require(datasets)
+data(swiss)
+str(swiss)
+head(swiss)
+
+ggplot(data = swiss) +
+  geom_point(mapping = aes(x = Agriculture, y = Fertility))
+
+ggplot(data = swiss) +
+  geom_point(mapping = aes(x = Examination, y = Fertility))
+
+ggplot(data = swiss) +
+  geom_point(mapping = aes(x = Education, y = Fertility))
+
+ggplot(data = swiss) +
+  geom_point(mapping = aes(x = Catholic, y = Fertility))
+
+ggplot(data = swiss) +
+  geom_point(mapping = aes(x = Infant.Mortality, y = Fertility))
+
+summary(lm(Fertility ~ ., data = swiss ))
+
+# Consider ooif adding parameters gives a better fit
+
+fit1 <- lm(Fertility ~ Agriculture, data = swiss)
+fit3 <- lm(Fertility ~ Agriculture + Examination + Education, data = swiss)
+fit5 <- lm(Fertility ~ Agriculture + Examination + Education + Catholic + Infant.Mortality, data = swiss)
+anova(fit1, fit3, fit5)
+
+# The answer is yes!
+```
+

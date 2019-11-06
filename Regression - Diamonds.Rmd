@@ -31,7 +31,10 @@ fit <- lm(price ~ carat, data = diamond)
 coef(fit)
   g + geom_smooth(method = "lm", colour = "black") +
   geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]) )
+```
 
+
+```{r}
 # If you center the carat values around the mean, the slope remains same, but the intersect changes 
 fit <- lm(price  ~ I(carat - mean(carat)), data = diamond)
 coef(fit)
@@ -43,7 +46,9 @@ gc <- ggplot(diamond, aes(x = carat - mean(carat), y = price)) +
   geom_point(size = 5, colour = "blue", alpha = 0.2) +
   geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
 gc
+```
 
+```{r}
 
 # Adjust the carat unitsto 1/10 of a carat
 fit <- lm(price ~ I(10*carat), data = diamond)
@@ -56,8 +61,10 @@ ga <- ggplot(diamond, aes(x = 10*carat, y = price)) +
   geom_point(size = 5, colour = "blue", alpha = 0.2) +
   geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
 ga
+```
 
 
+```{r}
 # If you adjust the carat units and center on the mean....
 fit <- lm(price ~ I(10 * carat - mean(10 * carat)), data = diamond)
 coef(fit)
@@ -68,6 +75,54 @@ gac <- ggplot(diamond, aes(x = 10 * carat - mean(10 * carat), y = price)) +
   geom_point(size = 5, colour = "blue", alpha = 0.2) +
   geom_abline(mapping = aes(intercept = coef(fit)[1], slope = coef(fit)[2]))
 gac
+```
+
+```{r}
+# Predict diamond prices 
+
+fit <- lm(price ~ carat, data = diamond)
+coef(fit)
+
+# Calculate manuallly
+newx <- c(0.16, 0.27, 0.34)
+coef(fit)[1] + coef(fit)[2] * newx
+
+# Or use the preict function
+
+predict(fit, newdata = data.frame(carat = newx))
 
 ```
+
+
+```{r}
+# Calcuklate the residuals
+data(diamond)
+y    <- diamond$price; 
+x    <- diamond$carat; 
+n    <- length(y)
+fit  <- lm(y ~ x)
+
+# Get it from the model
+e    <- resid(fit)
+yhat <- predict(fit)
+
+# Or calculate it
+e1   <- y - yhat
+max(abs(e - e1))
+max(abs(e - (y - coef(fit)[1] - coef(fit)[2] * x)))
+
+```
+
+```{r, echo = FALSE}
+
+# Plot the residuals against carat to see if there is any bias
+diamond$e <- resid(lm(price ~ carat, data = diamond))
+ggplot(diamond, aes(x = carat, y = e)) + 
+  xlab("Mass (carats)") +
+  ylab("Residual price (SIN $)") +
+  geom_hline(yintercept = 0, size = 1) +
+  geom_point(size = 7, colour = "black", alpha=0.5) +
+  geom_point(size = 5, colour = "blue", alpha=0.2)
+```
+
 

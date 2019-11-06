@@ -1,0 +1,29 @@
+---
+title: "Regression - Cars"
+author: "Hans"
+date: "11/4/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Is not working as expected.....
+
+```{r}
+Auto[1,]
+colnames(Auto) <- c("mpg", "cylinders", "displacement", "horsepower", 
+                    "weight", "acceleration", "year", "origin", "name")
+auto_for_mp <- Auto[-1,]
+auto_for_mp$horsepower <- as.numeric(auto_for_mp$horsepower)
+auto_for_mp$mpg <- as.numeric(auto_for_mp$mpg)
+
+ggplot(data = auto_for_mp) +
+  geom_point(mapping = aes(x = horsepower, y = mpg))
+
+str(auto_for_mp)
+lm(mpg ~ horsepower + horsepower^2, data = auto_for_mp)
+```
+
